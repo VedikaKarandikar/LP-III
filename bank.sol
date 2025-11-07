@@ -1,0 +1,32 @@
+// SPDX-License-Identifier:MIT
+pragma solidity ^0.8.0;
+
+contract Bank{
+    mapping(address=> uint256) private balances;
+    function createAccount() public{
+        balances[msg.sender]=0;
+    }
+    function deposit(uint256 amount) public payable{
+        require (msg.value>0, "Deposit amount should be greater than 0");
+        balances[msg.sender]+=amount;
+    }
+    function withdraw(uint256 amount) public {
+        require(balances[msg.sender]>=amount,"Insufficent balance");
+        balances[msg.sender]-=amount;
+        payable(msg.sender).transfer(amount);
+    }
+    function transfer(address recipient, uint256 amount) public{
+        require(balances[msg.sender]>=amount, "Insufficient balance");
+        balances[msg.sender]-=amount;
+        balances[recipient]+=amount;
+    }
+    function getBalance() public view returns(uint256){
+        return balances[msg.sender];
+    }
+    receive() external payable{
+        balances[msg.sender]+=msg.value;
+    }
+    fallback() external payable{
+        balances[msg.sender]+=msg.value;
+    }
+}
